@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Список заявок{% endblock %}
+{% block content %}
+<h2>Список заявок</h2>
+<ul>
+    {% for order in orders %}
+        <li>
+            <a href="{% url 'order_detail' order.id %}">
+                {{ order.client_name }} — {{ order.status|title }}
+            </a>
+        </li>
+    {% endfor %}
+</ul>
+{% endblock %}
