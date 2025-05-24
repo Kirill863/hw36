@@ -1,14 +1,20 @@
-
+{% load static %}
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Барбершоп</title>
-    
+    <title>{% block title %}Barbershop{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'main.css' %}">
 </head>
 <body>
-    <h1>Добро пожаловать в барбершоп!</h1>
-    <p>Здесь вы можете записаться на стрижку.</p>
+    <header>
+        <h1>Добро пожаловать в наш барбершоп!</h1>
+    </header>
 
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <script src="{% static 'main.js' %}"></script>
 </body>
 </html>
