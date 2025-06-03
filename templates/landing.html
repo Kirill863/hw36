@@ -1,32 +1,40 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="ru">
-<head>
-    <meta charset="UTF-8">
-    <title>Барбершоп</title>
-    <link rel="stylesheet" href="{% static 'main.css' %}">
-</head>
-<body>
-    <h1>Добро пожаловать в барбершоп!</h1>
+{% extends "base.html" %}
+{% block title %}Главная страница{% endblock %}
+{% block content %}
+<h1>Добро пожаловать в барбершоп!</h1>
 
-    <section>
-        <h2>Наши мастера:</h2>
-        <ul>
-            {% for master in masters %}
-                <li>{{ master.name }}</li>
-            {% endfor %}
-        </ul>
-    </section>
+<nav>
+    <a href="#about">О нас</a>
+    <a href="#services">Услуги</a>
+    <a href="#masters">Мастера</a>
+    <a href="#booking">Запись</a>
+</nav>
 
-    <section>
-        <h2>Наши услуги:</h2>
-        <ul>
-            {% for service in services %}
-                <li>{{ service }}</li>
-            {% endfor %}
-        </ul>
-    </section>
+<section id="about">
+    <h2>О нас</h2>
+    <p>Барбершоп</p>
+</section>
 
-    <a href="{% url 'orders_list' %}">Смотреть заявки</a>
-</body>
-</html>
+<section id="services">
+    <h2>Наши услуги</h2>
+    <ul>
+        {% for service in services %}
+            <li>{{ service }}</li>
+        {% endfor %}
+    </ul>
+</section>
+
+<section id="masters">
+    <h2>Наши мастера</h2>
+    <ul>
+        {% for master in masters %}
+            <li>{{ master.name }}</li>
+        {% endfor %}
+    </ul>
+</section>
+
+<section id="booking">
+    <h2>Записаться на услугу</h2>
+    <p>Хотите записаться? Нажмите <a href="{% url 'orders_list' %}">здесь</a>.</p>
+</section>
+{% endblock %}
