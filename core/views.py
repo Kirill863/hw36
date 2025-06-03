@@ -33,7 +33,7 @@ def orders_list(request):
 def order_detail(request, order_id):
     order = next((o for o in orders if o['id'] == order_id), None)
     if not order:
-        # Можно добавить обработку ошибки 404
+        
         return render(request, 'core/order_detail.html', {'order': None})
     return render(request, 'core/order_detail.html', {
         'order': order,
