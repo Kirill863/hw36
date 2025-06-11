@@ -20,7 +20,9 @@
                 </ul>
             </li>
             <li class="list-group-item">
-                <strong>Мастер:</strong> {{ order.master.name }}
+{% if master %}
+    <strong>Мастер:</strong> {{ master.name }}
+{% endif %}
             </li>
             <li class="list-group-item d-flex justify-content-between align-items-center">
                 <span><strong>Статус:</strong></span>

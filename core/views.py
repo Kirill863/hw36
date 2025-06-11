@@ -33,9 +33,24 @@ def orders_list(request):
 def order_detail(request, order_id):
     order = next((o for o in orders if o['id'] == order_id), None)
     if not order:
-        
         return render(request, 'core/order_detail.html', {'order': None})
+
+    # Найдём мастера по ID
+    master = next((m for m in masters if m['id'] == order['master_id']), None)
+
     return render(request, 'core/order_detail.html', {
         'order': order,
-        'masters': masters
+        'master': master
     })
+
+STATUS_COLORS = {
+    STATUS_NEW: 'warning',
+    STATUS_CONFIRMED: 'primary',
+    STATUS_CANCELLED: 'secondary',
+    STATUS_COMPLETED: 'success'
+}
+
+def orders_list(request):
+    for order in orders:
+        order['status_color'] = STATUS_COLORS.get(order['status'], 'light')
+    return render(request, 'core/orders_list.html', {'orders': orders})
