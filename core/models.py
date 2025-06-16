@@ -15,3 +15,15 @@ class Service(models.Model):
 
     def __str__(self):
         return self.name
+    
+class Master(models.Model):
+    name = models.CharField(max_length=150, verbose_name="Имя")
+    photo = models.ImageField(upload_to='masters/', blank=True, verbose_name="Фотография")
+    phone = models.CharField(max_length=20, verbose_name="Телефон")
+    address = models.CharField(max_length=255, verbose_name="Адрес")
+    experience = models.PositiveIntegerField(verbose_name="Стаж работы (лет)")
+    services = models.ManyToManyField(Service, related_name='masters', verbose_name="Услуги")
+    is_active = models.BooleanField(default=True, verbose_name="Активен")
+
+    def __str__(self):
+        return self.name
