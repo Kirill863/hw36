@@ -1,16 +1,9 @@
-
-
-# Create your views here.
-
 # views.py
 
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from .models import Master, Service, Order, Review
-from django.shortcuts import render
-from .data import masters, services, orders, STATUS_NEW, STATUS_CONFIRMED, STATUS_CANCELLED, STATUS_COMPLETED
-from django.contrib.admin.views.decorators import staff_member_required
 
 def index(request):
     masters = Master.objects.all()
@@ -24,43 +17,35 @@ def index(request):
     })
 
 
-def thanks(request):
-    return render(request, 'core/thanks.html')
-
-@staff_member_required
+@login_required
 def orders_list(request):
-    return render(request, 'core/orders_list.html', {
-        'orders': orders,
-        'statuses': {
-            'новая': STATUS_NEW,
-            'подтвержденная': STATUS_CONFIRMED,
-            'отмененная': STATUS_CANCELLED,
-            'выполненная': STATUS_COMPLETED
-        }
+    query = request.GET.get('q', '')
+    search_name = request.GET.get('search_name') == 'on'
+    search_phone = request.GET.get('search_phone') == 'on'
+    search_comment = request.GET.get('search_comment') == 'on'
+
+    queryset = Order.objects.all().order_by('-date_created')
+
+    if query:
+        q_objects = Q()
+        if search_name:
+            q_objects |= Q(client_name__icontains=query)
+        if search_phone:
+            q_objects |= Q(phone__icontains=query)
+        if search_comment:
+            q_objects |= Q(comment__icontains=query)
+        queryset = queryset.filter(q_objects)
+
+    return render(request, 'barbershop/orders_list.html', {
+        'orders': queryset,
+        'query': query,
+        'search_name': search_name or True,  # Имя клиента включено по умолчанию
+        'search_phone': search_phone,
+        'search_comment': search_comment
     })
 
 
-def order_detail(request, order_id):
-    order = next((o for o in orders if o['id'] == order_id), None)
-    if not order:
-        return render(request, 'core/order_detail.html', {'order': None})
-
-    # Найдём мастера по ID
-    master = next((m for m in masters if m['id'] == order['master_id']), None)
-
-    return render(request, 'core/order_detail.html', {
-        'order': order,
-        'master': master
-    })
-
-STATUS_COLORS = {
-    STATUS_NEW: 'warning',
-    STATUS_CONFIRMED: 'primary',
-    STATUS_CANCELLED: 'secondary',
-    STATUS_COMPLETED: 'success'
-}
-
-def orders_list(request):
-    for order in orders:
-        order['status_color'] = STATUS_COLORS.get(order['status'], 'light')
-    return render(request, 'core/orders_list.html', {'orders': orders})
+@login_required
+def order_detail(request, pk):
+    order = get_object_or_404(Order.objects.prefetch_related('services'), pk=pk)
+    return render(request, 'barbershop/order_detail.html', {'order': order})
