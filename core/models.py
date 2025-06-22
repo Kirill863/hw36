@@ -48,19 +48,18 @@ class Order(models.Model):
 
     def __str__(self):
         return f"{self.client_name} - {self.status}"
-    
+
 
 class Review(models.Model):
     text = models.TextField(verbose_name="Текст отзыва")
-    client_name = models.CharField(max_length=100, blank=True, verbose_name="Имя клиента")
-    master = models.ForeignKey(Master, on_delete=models.CASCADE, verbose_name="Мастер")
-    photo = models.ImageField(upload_to='reviews/', blank=True, null=True, verbose_name="Фотография")
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
+    client_name = models.CharField(max_length=100, verbose_name="Имя клиента")
+    master = models.ForeignKey('Master', on_delete=models.CASCADE, related_name='reviews')
     rating = models.PositiveSmallIntegerField(
         validators=[MinValueValidator(1), MaxValueValidator(5)],
         verbose_name="Оценка"
     )
-    is_published = models.BooleanField(default=True, verbose_name="Опубликован")
+    photo = models.ImageField(upload_to='reviews/', blank=True, null=True, verbose_name="Фотография")
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
 
     def __str__(self):
         return f"Отзыв от {self.client_name} о {self.master}"
