@@ -7,7 +7,7 @@ from .data import services
 
 def index(request):
     masters = Master.objects.all()
-    reviews = Review.objects.select_related('master').all()[:5]
+    reviews = Review.objects.select_related('master').all()[:5] 
     services = Service.objects.all()
 
     return render(request, 'barbershop/index.html', {
@@ -17,32 +17,11 @@ def index(request):
     })
 
 
+
 @login_required
-def orders_list(request):
-    query = request.GET.get('q', '')
-    search_name = request.GET.get('search_name') == 'on'
-    search_phone = request.GET.get('search_phone') == 'on'
-    search_comment = request.GET.get('search_comment') == 'on'
-
-    queryset = Order.objects.all().order_by('-date_created')
-
-    if query:
-        q_objects = Q()
-        if search_name:
-            q_objects |= Q(client_name__icontains=query)
-        if search_phone:
-            q_objects |= Q(phone__icontains=query)
-        if search_comment:
-            q_objects |= Q(comment__icontains=query)
-        queryset = queryset.filter(q_objects)
-
-    return render(request, 'barbershop/orders_list.html', {
-        'orders': queryset,
-        'query': query,
-        'search_name': search_name or True,  # Имя клиента включено по умолчанию
-        'search_phone': search_phone,
-        'search_comment': search_comment
-    })
+def order_list(request):
+    orders = Order.objects.all().order_by('-date_created')
+    return render(request, 'orders/order_list.html', {'orders': orders})
 
 
 @login_required
