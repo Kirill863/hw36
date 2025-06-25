@@ -1,4 +1,5 @@
 from django.db import models
+import random
 
 # Create your models here.
 
@@ -28,6 +29,10 @@ class Master(models.Model):
 
     def __str__(self):
         return self.name
+    def save(self, *args, **kwargs):
+        if self.experience is None:  # <-- Изменено: проверяем только значение
+            self.experience = random.randint(0, 10)
+        super().save(*args, **kwargs)
 
 STATUS_CHOICES = [
     ('not_approved', 'Не подтверждён'),
