@@ -7,7 +7,7 @@ from .data import services
 
 def index(request):
     masters = Master.objects.all()
-    reviews = Review.objects.all()
+    reviews = Review.objects.select_related('master').all()[:5]
     services = Service.objects.all()
 
     return render(request, 'barbershop/index.html', {
