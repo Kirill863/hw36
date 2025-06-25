@@ -22,18 +22,17 @@
                     <td>{{ order.client_name }}</td>
                     <td>{{ order.phone }}</td>
                     <td>{{ order.appointment_date|date:"d.m.Y H:i" }}</td>
+                    <td>{{ order.get_status_display }}</td>
                     <td>
-                        {% if order.status == 'not_approved' %}
-                            Не подтверждён
-                        {% elif order.status == 'approved' %}
-                            Подтверждён
-                        {% elif order.status == 'in_progress' %}
-                            В процессе
+                        {% if order.master %}
+                            {{ order.master.name }}
                         {% else %}
-                            Выполнен
+                            —
                         {% endif %}
                     </td>
-                    <td>{{ order.master.name|default:"—" }}</td>
+                    <td>
+                        <a href="{% url 'order_detail' order.id %}" class="btn btn-primary btn-sm">Подробнее</a>
+                    </td>
                 </tr>
             {% empty %}
                 <tr>

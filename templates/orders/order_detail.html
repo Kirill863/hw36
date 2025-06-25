@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block title %}Детали заявки №{{ order.id }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Заявка №{{ order.id }}</h2>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Информация о клиенте</h5>
+            <p class="card-text">
+                <strong>Имя клиента:</strong> {{ order.client_name }}<br>
+                <strong>Телефон:</strong> {{ order.phone }}<br>
+                <strong>Комментарий:</strong> {{ order.comment|default:"—" }}
+            </p>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Услуги</h5>
+            {% if order.services.all %}
+                <ul class="list-group list-group-flush">
+                    {% for service in order.services.all %}
+                        <li class="list-group-item">{{ service.name }} — {{ service.price }} ₽</li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <p>Нет выбранных услуг.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Мастер</h5>
+            {% if order.master %}
+                <p><strong>{{ order.master.name }}</strong></p>
+                {% if order.master.photo %}
+                    <img src="{{ order.master.photo.url }}" alt="Фото мастера" width="150">
+                {% endif %}
+            {% else %}
+                <p>Мастер не назначен</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Даты</h5>
+            <p class="card-text">
+                <strong>Дата создания:</strong> {{ order.date_created|date:"d.m.Y H:i" }}<br>
+                <strong>Дата записи:</strong> {{ order.appointment_date|date:"d.m.Y H:i" }}<br>
+                <strong>Статус:</strong> {{ order.get_status_display }}
+            </p>
+        </div>
+    </div>
+
+    <a href="{% url 'order_list' %}" class="btn btn-secondary">Назад к списку заявок</a>
+</div>
+{% endblock %}

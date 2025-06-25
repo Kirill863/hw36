@@ -26,8 +26,8 @@ def order_list(request):
 
 @login_required
 def order_detail(request, pk):
-    order = get_object_or_404(Order.objects.prefetch_related('services'), pk=pk)
-    return render(request, 'barbershop/order_detail.html', {'order': order})
+    order = get_object_or_404(Order, pk=pk)
+    return render(request, 'orders/order_detail.html', {'order': order})
 
 def thanks(request):
     return render(request, 'barbershop/thanks.html')
