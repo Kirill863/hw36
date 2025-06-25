@@ -2,68 +2,70 @@
 {% block title %}Главная страница{% endblock %}
 
 {% block content %}
-<h1 class="mb-4">Добро пожаловать в барбершоп!</h1>
+<div class="container">
 
-<nav>
-    <a href="#about">О нас</a>
-    <a href="#services">Услуги</a>
-    <a href="#masters">Мастера</a>
-    <a href="#booking">Запись</a>
-    <a href="#reviews">Отзывы</a>
-</nav>
+    <h1 class="mb-4">Добро пожаловать в барбершоп!</h1>
 
-<section id="about" class="mt-4">
-    <h2>О нас</h2>
-    <p>Барбершоп "Стальная борода"</p>
-</section>
+    <nav>
+        <a href="#about">О нас</a>
+        <a href="#services">Услуги</a>
+        <a href="#masters">Мастера</a>
+        <a href="#booking">Запись</a>
+        <a href="#reviews">Отзывы</a>
+    </nav>
 
-<section id="services" class="mt-4">
-    <h2>Наши услуги</h2>
-    <ul>
-        {% for service in services %}
-            <li class='card'>{{ service }}</li>
-        {% endfor %}
-    </ul>
-</section>
+    <section id="about" class="mt-4">
+        <h2>О нас</h2>
+        <p>Барбершоп "Стальная борода"</p>
+    </section>
 
-<!-- Блок мастеров -->
-<section id="masters" class="mt-4">
-    <h2>Наши мастера</h2>
-    <div class="row">
-        {% for master in masters %}
-        <div class="col-md-4 mb-4">
-            <div class="card">
-                
-                <div class="card-body">
-                    <h5 class="card-title">{{ master.name }}</h5>
-                    <p class="card-text">{{ master.experience }}</p>
+    <section id="services" class="mt-4">
+        <h2>Наши услуги</h2>
+        <ul>
+            {% for service in services %}
+                <li class='card'>{{ service }}</li>
+            {% endfor %}
+        </ul>
+    </section>
+
+    <!-- Блок мастеров -->
+    <section id="masters" class="mt-4">
+        <h2>Наши мастера</h2>
+        <div class="row">
+            {% for master in masters %}
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ master.name }}</h5>
+                        <p class="card-text">{{ master.experience }} лет опыта</p>
+                    </div>
                 </div>
             </div>
+            {% endfor %}
         </div>
-        {% endfor %}
-    </div>
-</section>
+    </section>
 
-<!-- Блок отзывов -->
-<section id="reviews" class="mt-4">
-    <h2>Что говорят клиенты</h2>
-    <div class="row">
-        {% for review in reviews %}
-        <div class="col-md-4 mb-4">
-            <div class="card">
-                <div class="card-body">
-                    <h6 class="card-subtitle mb-2 text-muted">{{ review.client_name }} ★{{ review.rating }}</h6>
-                    <p class="card-text">{{ review.text }}</p>
+    <!-- Блок отзывов -->
+    <section id="reviews" class="mt-4">
+        <h2>Что говорят клиенты</h2>
+        <div class="row">
+            {% for review in reviews %}
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h6 class="card-subtitle mb-2 text-muted">{{ review.client_name }} ★{{ review.rating }}</h6>
+                        <p class="card-text">{{ review.text }}</p>
+                    </div>
                 </div>
             </div>
+            {% endfor %}
         </div>
-        {% endfor %}
-    </div>
-</section>
+    </section>
 
-<section id="booking" class="mt-4">
-    <h2>Записаться на услугу</h2>
-    <p>Хотите записаться? Нажмите <a href="{% url 'orders_list' %}">здесь</a>.</p>
-</section>
+    <section id="booking" class="mt-4">
+        <h2>Записаться на услугу</h2>
+        <p>Хотите записаться? Нажмите <a href="{% url 'orders_list' %}">здесь</a>.</p>
+    </section>
 
+</div>
 {% endblock %}
