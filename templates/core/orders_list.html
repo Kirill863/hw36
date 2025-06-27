@@ -5,37 +5,41 @@
 
 <!-- Форма поиска -->
 <form method="get">
-<input type="text" name="q" value="{{ query }}" placeholder="Поиск..." class="form-control mb-2">
+    <div class="mb-3">
+        <input type="text" name="q" value="{{ query }}" placeholder="Введите для поиска..." class="form-control mb-2" />
+    </div>
 
-<div class="form-check">
-    <input class="form-check-input" type="checkbox" name="search_name" id="search_name"
-        {% if search_name %}checked{% endif %}>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="search_name" id="search_name"
+            {% if search_name %}checked{% endif %}>
     <label class="form-check-label" for="search_name">Имя клиента</label>
-</div>
+    </div>
 
-<div class="form-check">
-    <input class="form-check-input" type="checkbox" name="search_phone" id="search_phone"
-        {% if search_phone %}checked{% endif %}>
-    <label class="form-check-label" for="search_phone">Телефон</label>
-</div>
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="search_phone" id="search_phone"
+            {% if search_phone %}checked{% endif %}>
+        <label class="form-check-label" for="search_phone">Телефон</label>
+    </div>
 
-<div class="form-check">
+    <div class="form-check">
     <input class="form-check-input" type="checkbox" name="search_comment" id="search_comment"
         {% if search_comment %}checked{% endif %}>
     <label class="form-check-label" for="search_comment">Комментарий</label>
-</div>
+    </div>
 
-<button type="submit" class="btn btn-primary mt-2">Найти</button>
+    <button type="submit" class="btn btn-primary mt-3">Найти</button>
 </form>
 
 <!-- Список заявок -->
 <ul class="list-group mt-4">
-{% for order in orders %}
+    {% for order in orders %}
     <li class="list-group-item">
-    <a href="{% url 'order_detail' order.id %}">
-        {{ order.client_name }} — {{ order.status|title }}
-    </a>
+        <a href="{% url 'order_detail' order.id %}">
+            {{ order.client_name }} — {{ order.status|title }}
+        </a>
     </li>
-{% endfor %}
+    {% empty %}
+    <li class="list-group-item text-muted">Заявки не найдены.</li>
+    {% endfor %}
 </ul>
 {% endblock %}

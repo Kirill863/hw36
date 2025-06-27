@@ -1,45 +1,45 @@
 {% extends "base.html" %}
 {% block title %}Список заявок{% endblock %}
-
 {% block content %}
-<div class="container mt-4">
-    <h2>Список заявок</h2>
+<h2>Список заявок</h2>
 
-    <!-- Таблица заявок -->
-    <table class="table table-striped table-hover">
-        <thead class="table-dark">
-            <tr>
-                <th>Имя клиента</th>
-                <th>Телефон</th>
-                <th>Дата записи</th>
-                <th>Статус</th>
-                <th>Мастер</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for order in orders %}
-                <tr>
-                    <td>{{ order.client_name }}</td>
-                    <td>{{ order.phone }}</td>
-                    <td>{{ order.appointment_date|date:"d.m.Y H:i" }}</td>
-                    <td>{{ order.get_status_display }}</td>
-                    <td>
-                        {% if order.master %}
-                            {{ order.master.name }}
-                        {% else %}
-                            —
-                        {% endif %}
-                    </td>
-                    <td>
-                        <a href="{% url 'order_detail' order.id %}" class="btn btn-primary btn-sm">Подробнее</a>
-                    </td>
-                </tr>
-            {% empty %}
-                <tr>
-                    <td colspan="5" class="text-center">Нет заявок</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
+<!-- Форма поиска -->
+<form method="get">
+    <div class="mb-3">
+        <input type="text" name="q" value="{{ query }}" placeholder="Введите для поиска..." class="form-control mb-2" />
+    </div>
+
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="search_name" id="search_name"
+            {% if search_name %}checked{% endif %}>
+    <label class="form-check-label" for="search_name">Имя клиента</label>
+    </div>
+
+    <div class="form-check">
+        <input class="form-check-input" type="checkbox" name="search_phone" id="search_phone"
+            {% if search_phone %}checked{% endif %}>
+        <label class="form-check-label" for="search_phone">Телефон</label>
+    </div>
+
+    <div class="form-check">
+    <input class="form-check-input" type="checkbox" name="search_comment" id="search_comment"
+        {% if search_comment %}checked{% endif %}>
+    <label class="form-check-label" for="search_comment">Комментарий</label>
+    </div>
+
+    <button type="submit" class="btn btn-primary mt-3">Найти</button>
+</form>
+
+<!-- Список заявок -->
+<ul class="list-group mt-4">
+    {% for order in orders %}
+    <li class="list-group-item">
+        <a href="{% url 'order_detail' order.id %}">
+            {{ order.client_name }} — {{ order.status|title }}
+        </a>
+    </li>
+    {% empty %}
+    <li class="list-group-item text-muted">Заявки не найдены.</li>
+    {% endfor %}
+</ul>
 {% endblock %}
