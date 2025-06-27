@@ -31,3 +31,33 @@ def order_detail(request, pk):
 
 def thanks(request):
     return render(request, 'barbershop/thanks.html')
+
+def order_list(request):
+    query = request.GET.get('q', '')
+    search_name = 'search_name' in request.GET
+    search_phone = 'search_phone' in request.GET
+    search_comment = 'search_comment' in request.GET
+
+    # По умолчанию выбираем всё
+    orders = Order.objects.all()
+
+    # Если нет активных фильтров — не применяем фильтрацию
+    if query:
+        q_objects = Q()
+
+        if search_name:
+            q_objects |= Q(client_name__icontains=query)
+        if search_phone:
+            q_objects |= Q(phone__icontains=query)
+        if search_comment:
+            q_objects |= Q(comment__icontains=query)
+
+        orders = orders.filter(q_objects)
+
+    return render(request, 'orders/order_list.html', {
+        'orders': orders,
+        'query': query,
+        'search_name': search_name,
+        'search_phone': search_phone,
+        'search_comment': search_comment,
+    })
