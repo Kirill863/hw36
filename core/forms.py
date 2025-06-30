@@ -25,39 +25,39 @@ class ReviewForm(forms.ModelForm):
 class OrderForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Делаем services необязательным при инициализации
-        self.fields['services'].required = False
-        # Если передан мастер, фильтруем услуги
+        self.fields['master'].queryset = Master.objects.all()
+        self.fields['services'].queryset = Service.objects.none()
+        self.fields['services'].widget = forms.CheckboxSelectMultiple(
+            attrs={'class': 'form-check-input'}
+        )
+        
         if 'master' in self.data:
             try:
                 master_id = int(self.data.get('master'))
-                master = Master.objects.get(id=master_id)
-                self.fields['services'].queryset = master.services.all()
-            except (ValueError, Master.DoesNotExist):
+                self.fields['services'].queryset = Service.objects.filter(masters__id=master_id)
+            except (ValueError, TypeError):
                 pass
-    
-    class Meta:
-        model = Order
-        fields = ['master', 'services', 'client_name', 'phone', 'comment', 'appointment_date']
-        widgets = {
-            'master': forms.Select(attrs={'class': 'form-control', 'id': 'master-select'}),
-            'services': forms.SelectMultiple(attrs={'class': 'form-control', 'id': 'services-select'}),
-            'client_name': forms.TextInput(attrs={'class': 'form-control'}),
-            'phone': forms.TextInput(attrs={'class': 'form-control'}),
-            'comment': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
-            'appointment_date': forms.DateTimeInput(attrs={'class': 'form-control', 'type': 'datetime-local'}),
-        }
-    
+
     def clean(self):
         cleaned_data = super().clean()
         master = cleaned_data.get('master')
         services = cleaned_data.get('services')
         
         if master and services:
-            invalid_services = [service for service in services if service not in master.services.all()]
+            invalid_services = [s for s in services if s not in master.services.all()]
             if invalid_services:
-                invalid_names = ", ".join([s.name for s in invalid_services])
                 raise forms.ValidationError(
-                    f"Мастер {master.name} не предоставляет выбранные услуги: {invalid_names}"
+                    f"Мастер {master.name} не предоставляет выбранные услуги: {', '.join(s.name for s in invalid_services)}"
                 )
         return cleaned_data
+    
+    class Meta:
+        model = Order
+        fields = ['master', 'services', 'client_name', 'phone', 'comment', 'appointment_date']
+        widgets = {
+            'master': forms.Select(attrs={'class': 'form-control', 'id': 'master-select'}),
+            'client_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'phone': forms.TextInput(attrs={'class': 'form-control'}),
+            'comment': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'appointment_date': forms.DateTimeInput(attrs={'class': 'form-control', 'type': 'datetime-local'}),
+        }

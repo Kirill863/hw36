@@ -4,6 +4,9 @@ from django.db.models import Q
 from django.http import JsonResponse
 from .models import Master, Service, Order, Review
 from .forms import ReviewForm, OrderForm
+from django.http import JsonResponse
+from django.http import JsonResponse
+from django.template.loader import render_to_string
 
 def index(request):
     masters = Master.objects.all()
@@ -78,8 +81,19 @@ def create_order(request):
 
 def get_services(request):
     master_id = request.GET.get('master_id')
-    if not master_id:
-        return JsonResponse([], safe=False)
-    
-    services = Service.objects.filter(masters__id=master_id).values('id', 'name')
-    return JsonResponse(list(services), safe=False)
+    selected_services = request.GET.getlist('selected_services[]')
+
+    try:
+        master_id = int(master_id)
+        services = Service.objects.filter(masters__id=master_id)
+    except (ValueError, TypeError):
+        services = Service.objects.none()
+
+    # Передаем данные в контекст шаблона
+    context = {
+        'services': services,
+        'selected_services': selected_services
+    }
+
+    html = render_to_string('includes/services_checkboxes.html', context)
+    return JsonResponse({'html': html})
