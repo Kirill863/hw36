@@ -33,11 +33,12 @@
     
 </form>
 
+
 <!-- Кнопка создания новой заявки -->
-<div style="background: yellow; padding: 10px;">
-    Тестовый блок перед кнопкой
-    {% url 'create_order' as order_url %}
-    URL: {{ order_url|default:"Не найден" }}
+<div class="mb-4">
+    <a href="{% url 'create_order' %}" class="btn btn-success">
+        <i class="bi bi-plus-circle"></i> Создать новую заявку
+    </a>
 </div>
 
 <!-- Список заявок -->

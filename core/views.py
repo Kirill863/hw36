@@ -64,7 +64,7 @@ def create_review(request):
             return redirect('thanks')
     else:
         form = ReviewForm()
-    return render(request, 'core/review_form.html', {'form': form})
+    return render(request, 'orders/review_form.html', {'form': form})
 
 def create_order(request):
     if request.method == 'POST':
@@ -74,7 +74,7 @@ def create_order(request):
             return redirect('thanks')
     else:
         form = OrderForm()
-    return render(request, 'core/order_form.html', {'form': form})
+    return render(request, 'orders/order_form.html', {'form': form})
 
 def get_services(request):
     master_id = request.GET.get('master_id')
