@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Создать заявку</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">Отправить</button>
+</form>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+    $('#id_master').change(function() {
+        var masterId = $(this).val();
+        if (masterId) {
+            $.ajax({
+                url: '/get-services/',
+                data: {
+                    'master_id': masterId
+                },
+                success: function(data) {
+                    $('#id_services').empty();
+                    $.each(data, function(index, service) {
+                        $('#id_services').append(
+                            $('<option></option>').attr('value', service.id).text(service.name)
+                        );
+                    });
+                }
+            });
+        } else {
+            $('#id_services').empty();
+        }
+    });
+});
+</script>
+{% endblock %}
