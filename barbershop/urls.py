@@ -23,13 +23,14 @@ from core import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.index, name='index'),
+    path('review/', views.create_review, name='create_review'),
+    path('order/', views.create_order, name='create_order'),
+    path('get-services/', views.get_services, name='get_services'),
     path('thanks/', views.thanks, name='thanks'),
     path('orders/', views.order_list, name='order_list'),
     path('orders/<int:pk>/', views.order_detail, name='order_detail'),
     path('accounts/', include('django.contrib.auth.urls')),
-    path('review/', views.create_review, name='create_review'),
-    path('order/', views.create_order, name='create_order'),
-    path('get-services/', views.get_services, name='get_services'),
 ]
+
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
