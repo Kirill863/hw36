@@ -3,7 +3,9 @@ from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from .models import Master, Service, Order, Review
 from .data import services
-
+from django.shortcuts import render, redirect
+from django.http import JsonResponse
+from .forms import ReviewForm, OrderForm 
 
 def index(request):
     masters = Master.objects.all()
