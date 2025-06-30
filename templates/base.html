@@ -7,32 +7,53 @@
     <title>{% block title %}Барбершоп "Стальная борода"{% endblock %}</title>
 
     <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"  rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
     <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"> 
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="{% static 'main.css' %}">
     {% block extra_head %}{% endblock %}
 </head>
 <body>
-    <header class="header">
+    <header class="header bg-light">
         {% include 'includes/menu.html' %}
     </header>
 
     <main class="container mt-5">
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
         {% block content %}
-            <p>Это основное содержимое страницы.</p>
+        <!-- Основное содержимое страницы -->
         {% endblock %}
     </main>
 
     <footer class="bg-dark text-white p-4 mt-5">
         <div class="container">
-            <p>© 2023 Барбершоп . Все права защищены кем то.</p>
+            <p class="mb-0">© {% now "Y" %} Барбершоп "Стальная борода". Все права защищены.</p>
         </div>
     </footer>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script> 
+    <!-- Bootstrap JS с integrity проверкой -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
     <script src="{% static 'main.js' %}"></script>
     {% block scripts %}{% endblock %}
+    
+    <!-- Отладочный элемент -->
+    <div style="position: fixed; bottom: 0; right: 0; background: red; color: white; padding: 5px; z-index: 1000; display: none;">
+        DEBUG: Base template loaded
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelector('div[style*="DEBUG"]').style.display = 'block';
+        });
+    </script>
 </body>
 </html>

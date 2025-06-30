@@ -3,6 +3,8 @@
 {% block content %}
 <h2>Список заявок</h2>
 
+
+
 <!-- Форма поиска -->
 <form method="get">
     <div class="mb-3">
@@ -12,7 +14,7 @@
     <div class="form-check">
         <input class="form-check-input" type="checkbox" name="search_name" id="search_name"
             {% if search_name %}checked{% endif %}>
-    <label class="form-check-label" for="search_name">Имя клиента</label>
+        <label class="form-check-label" for="search_name">Имя клиента</label>
     </div>
 
     <div class="form-check">
@@ -22,13 +24,21 @@
     </div>
 
     <div class="form-check">
-    <input class="form-check-input" type="checkbox" name="search_comment" id="search_comment"
-        {% if search_comment %}checked{% endif %}>
-    <label class="form-check-label" for="search_comment">Комментарий</label>
+        <input class="form-check-input" type="checkbox" name="search_comment" id="search_comment"
+            {% if search_comment %}checked{% endif %}>
+        <label class="form-check-label" for="search_comment">Комментарий</label>
     </div>
 
     <button type="submit" class="btn btn-primary mt-3">Найти</button>
+    
 </form>
+
+<!-- Кнопка создания новой заявки -->
+<div style="background: yellow; padding: 10px;">
+    Тестовый блок перед кнопкой
+    {% url 'create_order' as order_url %}
+    URL: {{ order_url|default:"Не найден" }}
+</div>
 
 <!-- Список заявок -->
 <ul class="list-group mt-4">
