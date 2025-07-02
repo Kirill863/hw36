@@ -45,23 +45,27 @@
         </div>
     </section>
 
-    <!-- Блок отзывов -->
-    <section id="reviews" class="mt-4">
-        <h2>Что говорят клиенты</h2>
-        <div class="row">
-            {% for review in reviews %}
-            <div class="col-md-4 mb-4">
-                <div class="card">
-                    <div class="card-body">
-                        <h6 class="card-subtitle mb-2 text-muted">{{ review.client_name }} ★{{ review.rating }}</h6>
-                        <p class="card-text">{{ review.text }}</p>
-                        <small class="text-muted">Мастер: {{ review.master.name }}</small>
-                    </div>
+<!-- Блок отзывов -->
+<section id="reviews" class="mt-4">
+    <h2>Что говорят клиенты</h2>
+
+    <!-- Кнопка "Оставить отзыв" -->
+    <a href="{% url 'review_create' %}" class="btn btn-success btn-sm mb-3">Оставить отзыв</a>
+
+    <div class="row">
+        {% for review in reviews %}
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h6 class="card-subtitle mb-2 text-muted">{{ review.client_name }} ★{{ review.rating }}</h6>
+                    <p class="card-text">{{ review.text }}</p>
+                    <small class="text-muted">Мастер: {{ review.master.name }}</small>
                 </div>
             </div>
-            {% endfor %}
         </div>
-    </section>
+        {% endfor %}
+    </div>
+</section>
 
     <section id="booking" class="mt-4">
         <h2>Записаться на услугу</h2>

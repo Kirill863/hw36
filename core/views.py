@@ -2,6 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.http import JsonResponse
+from django.views.generic import CreateView
 from .models import Master, Service, Order, Review
 from .forms import ReviewForm, OrderForm
 from django.http import JsonResponse
@@ -103,3 +104,9 @@ def get_services(request):
             return JsonResponse({'error': 'Ошибка при загрузке услуг'}, status=500)
     else:
         return JsonResponse({'html': ''})
+    
+class ReviewCreateView(CreateView):
+    model = Review
+    form_class = ReviewForm
+    template_name = 'orders/review_form.html'
+    success_url = '/'  # Перенаправление после успешного сохранения
