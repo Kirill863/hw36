@@ -23,41 +23,33 @@ class ReviewForm(forms.ModelForm):
         }
 
 class OrderForm(forms.ModelForm):
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['master'].queryset = Master.objects.all()
-        self.fields['services'].queryset = Service.objects.none()
-        self.fields['services'].widget = forms.CheckboxSelectMultiple(
-            attrs={'class': 'form-check-input'}
-        )
-        
-        if 'master' in self.data:
-            try:
-                master_id = int(self.data.get('master'))
-                self.fields['services'].queryset = Service.objects.filter(masters__id=master_id)
-            except (ValueError, TypeError):
-                pass
-
-    def clean(self):
-        cleaned_data = super().clean()
-        master = cleaned_data.get('master')
-        services = cleaned_data.get('services')
-        
-        if master and services:
-            invalid_services = [s for s in services if s not in master.services.all()]
-            if invalid_services:
-                raise forms.ValidationError(
-                    f"Мастер {master.name} не предоставляет выбранные услуги: {', '.join(s.name for s in invalid_services)}"
-                )
-        return cleaned_data
-    
     class Meta:
         model = Order
         fields = ['master', 'services', 'client_name', 'phone', 'comment', 'appointment_date']
-        widgets = {
-            'master': forms.Select(attrs={'class': 'form-control', 'id': 'master-select'}),
-            'client_name': forms.TextInput(attrs={'class': 'form-control'}),
-            'phone': forms.TextInput(attrs={'class': 'form-control'}),
-            'comment': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
-            'appointment_date': forms.DateTimeInput(attrs={'class': 'form-control', 'type': 'datetime-local'}),
-        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['services'].queryset = Service.objects.none()  # Изначально пустой queryset
+
+        if 'master' in self.data:
+            try:
+                master_id = int(self.data.get('master'))
+                self.fields['services'].queryset = Service.objects.filter(master_id=master_id)
+            except (ValueError, TypeError):
+                pass  # Если мастер не выбран или ошибка
+        elif self.instance.pk:
+            self.fields['services'].queryset = self.instance.master.services.all()
+
+    def clean(self):
+        cleaned_data = super().clean()
+        master = cleaned_data.get("master")
+        services = cleaned_data.get("services")
+
+        if master and services:
+            valid_services = master.services.values_list('id', flat=True)
+            for service in services:
+                if service.id not in valid_services:
+                    raise forms.ValidationError(
+                        f"Услуга '{service.name}' недоступна для мастера {master}."
+                    )
+        return cleaned_data

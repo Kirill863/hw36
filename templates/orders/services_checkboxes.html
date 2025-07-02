@@ -1,8 +1,8 @@
 {% for service in services %}
 <div class="col-md-6 mb-2">
     <div class="form-check">
-        <input class="form-check-input" type="checkbox"
-                name="services" value="{{ service.id }}"
+        <input class="form-check-input" type="checkbox" 
+                name="services" value="{{ service.id }}" 
                 id="service_{{ service.id }}"
                 {% if service.id|stringformat:"s" in selected_services %}checked{% endif %}>
         <label class="form-check-label" for="service_{{ service.id }}">

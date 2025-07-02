@@ -81,19 +81,25 @@ def create_order(request):
 
 def get_services(request):
     master_id = request.GET.get('master_id')
-    selected_services = request.GET.getlist('selected_services[]')
+    
+    if master_id:
+        try:
+            # Получаем услуги, связанные с мастером
+            services = Service.objects.filter(masters__id=master_id)
+            
+            # Получаем уже выбранные услуги (для сохранения состояния чекбоксов)
+            selected_services = request.GET.getlist('selected_services[]')
 
-    try:
-        master_id = int(master_id)
-        services = Service.objects.filter(masters__id=master_id)
-    except (ValueError, TypeError):
-        services = Service.objects.none()
+            # Рендерим шаблон
+            html = render_to_string('orders/services_checkboxes.html', {
+                'services': services,
+                'selected_services': selected_services
+            })
 
-    # Передаем данные в контекст шаблона
-    context = {
-        'services': services,
-        'selected_services': selected_services
-    }
-
-    html = render_to_string('includes/services_checkboxes.html', context)
-    return JsonResponse({'html': html})
+            return JsonResponse({'html': html})
+        except Exception as e:
+            # Логируем ошибку и возвращаем сообщение
+            print("Ошибка при загрузке услуг:", str(e))
+            return JsonResponse({'error': 'Ошибка при загрузке услуг'}, status=500)
+    else:
+        return JsonResponse({'html': ''})
