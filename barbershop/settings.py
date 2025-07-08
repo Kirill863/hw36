@@ -35,6 +35,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -128,3 +129,46 @@ STATICFILES_DIRS = [
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CORS_ALLOW_ALL_ORIGINS = True  # Разрешить все домены (для теста)
+
+JAZZMIN_SETTINGS = {
+    # Название, отображаемое в админке
+    "site_title": "Barbershop Admin",
+
+    # Название в интерфейсе (внизу сайдбара)
+    "site_header": "Barbershop",
+
+    # Название в табе браузера
+    "site_brand": "Barbershop CMS",
+
+    # Логотип (путь к изображению в STATIC или MEDIA)
+    # "site_logo": "path/to/logo.png",
+
+    # Иконка для сайта (favicon)
+    # "site_icon": "path/to/icon.png",
+
+    # CSS класс для логотипа
+    "site_logo_classes": "img-circle",
+
+    # Порядок пунктов меню
+    "order_with_respect_to": ["core", "auth", "services", "barbers", "reviews"],
+
+    # Автоматическое скрытие неиспользуемых моделей
+    "hide_models": [],
+
+    # Скрыть модель в админке
+    # "hide_models": ["app_name.ModelName"],
+
+    # Стиль навигационного меню
+    "navigation_expanded": True,
+
+    # Отображение формы поиска в меню
+    "show_sidebar": True,
+
+    # Цветовая тема (dark/light/auto)
+    "ui_tweaks": {
+        "theme": "cosmo",
+    },
+
+    # Отображение информации о версии Django в футере
+    "show_version": True,
+}
