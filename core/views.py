@@ -1,3 +1,4 @@
+from django.contrib import admin
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
@@ -117,3 +118,23 @@ class OrderCreateView(CreateView):
     form_class = OrderForm
     template_name = 'orders/order_form.html'
     success_url = reverse_lazy('thanks')
+
+class RatingFilter(admin.SimpleListFilter):
+    title = 'Рейтинг'
+    parameter_name = 'rating'
+
+    def lookups(self, request, model_admin):
+        return (
+            ('high', 'Высокий (4-5 звезд)'),
+            ('medium', 'Средний (2-3 звезды)'),
+            ('low', 'Низкий (1 звезда)'),
+        )
+
+    def queryset(self, request, queryset):
+        if self.value() == 'high':
+            return queryset.filter(rating__gte=4)
+        elif self.value() == 'medium':
+            return queryset.filter(rating__gte=2, rating__lte=3)
+        elif self.value() == 'low':
+            return queryset.filter(rating=1)
+        return queryset

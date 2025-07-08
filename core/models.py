@@ -12,7 +12,8 @@ class Service(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, verbose_name="Цена")
     duration = models.IntegerField(null=True, blank=True, verbose_name="Длительность (мин)")
     is_popular = models.BooleanField(default=False, verbose_name="Популярная услуга")
-    image = models.ImageField(upload_to='services/', blank=True, verbose_name="Изображение")
+    is_published = models.BooleanField(default=True, verbose_name="Опубликована")
+    
 
     class Meta:
         verbose_name = "Услуга"
