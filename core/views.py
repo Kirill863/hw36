@@ -2,6 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.http import JsonResponse
+from django.urls import reverse_lazy
 from django.views.generic import CreateView
 from .models import Master, Service, Order, Review
 from .forms import ReviewForm, OrderForm
@@ -58,7 +59,7 @@ def order_detail(request, pk):
     return render(request, 'orders/order_detail.html', {'order': order})
 
 def thanks(request):
-    return render(request, 'barbershop/thanks.html')
+    return render(request, 'orders/thanks.html')
 
 def create_review(request):
     if request.method == 'POST':
@@ -109,4 +110,10 @@ class ReviewCreateView(CreateView):
     model = Review
     form_class = ReviewForm
     template_name = 'orders/review_form.html'
-    success_url = '/'  # Перенаправление после успешного сохранения
+    success_url = reverse_lazy('thanks')  # Перенаправление после успешного сохранения
+
+class OrderCreateView(CreateView):
+    model = Order
+    form_class = OrderForm
+    template_name = 'orders/order_form.html'
+    success_url = reverse_lazy('thanks')

@@ -43,7 +43,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_extensions',
     'core',
-    'corsheaders'
+    'corsheaders',
+    'modeltranslation',
+    
 ]
 
 MIDDLEWARE = [
@@ -100,14 +102,18 @@ AUTH_PASSWORD_VALIDATORS = []
 # Internationalization
 # https://docs.djangoproject.com/en/5.2/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGES = [
+    ('ru', 'Russian'),
+    ('en', 'English'),
+]
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Moscow'  # Укажите вашу временную зону
 
 USE_I18N = True
-
+USE_L10N = True  
 USE_TZ = True
 
+MODELTRANSLATION_DEFAULT_LANGUAGE = 'ru'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
