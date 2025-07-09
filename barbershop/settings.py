@@ -172,3 +172,20 @@ JAZZMIN_SETTINGS = {
     # Отображение информации о версии Django в футере
     "show_version": True,
 }
+
+
+# Mistral AI
+MISTRAL_API_KEY = os.getenv("MISTRAL_API_KEY")
+
+# Пороги для модерации
+MISTRAL_MODERATIONS_GRADES = {
+    "hate_and_discrimination": 0.5,
+    "sexual": 0.5,
+    "violence_and_threats": 0.5,
+    "dangerous_and_criminal_content": 0.5,
+    "selfharm": 0.5,
+    "health": 0.3,
+    "financial": 0.3,
+    "law": 0.3,
+    "pii": 0.3,
+}

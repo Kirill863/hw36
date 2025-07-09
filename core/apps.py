@@ -10,4 +10,4 @@ class ReviewsConfig(AppConfig):
     name = 'reviews'
 
     def ready(self):
-        import reviews.signals
+        import core.signals
