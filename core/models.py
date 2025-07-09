@@ -68,16 +68,47 @@ class Order(models.Model):
     def __str__(self):
         return f"{self.client_name} - {self.status}"
 
+# models.py
+
+from django.db import models
+from django.core.validators import MinValueValidator, MaxValueValidator
+from core.models import Master  
+
+AI_CHOICES = [
+    ("ai_checked_true", "Проверено ИИ"),
+    ("ai_cancelled", "Отменено ИИ"),
+    ("ai_checked_in_progress", "В процессе проверки"),
+    ("ai_checked_false", "Не проверено"),
+]
+
 class Review(models.Model):
     text = models.TextField(verbose_name="Текст отзыва")
     client_name = models.CharField(max_length=100, verbose_name="Имя клиента")
-    master = models.ForeignKey('Master', on_delete=models.CASCADE, related_name='reviews')
+    master = models.ForeignKey(
+        Master,
+        on_delete=models.CASCADE,
+        related_name='reviews',
+        verbose_name="Мастер"
+    )
     rating = models.PositiveSmallIntegerField(
         validators=[MinValueValidator(1), MaxValueValidator(5)],
         verbose_name="Оценка"
     )
-    photo = models.ImageField(upload_to='reviews/', blank=True, null=True, verbose_name="Фотография")
+    photo = models.ImageField(
+        upload_to='reviews/',
+        blank=True,
+        null=True,
+        verbose_name="Фотография"
+    )
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
+
+    # Статус проверки ИИ
+    ai_checked_status = models.CharField(
+        max_length=30,
+        choices=AI_CHOICES,
+        default="ai_checked_false",
+        verbose_name="Статус проверки ИИ"
+    )
 
     class Meta:
         verbose_name = "Отзыв"
@@ -85,4 +116,3 @@ class Review(models.Model):
 
     def __str__(self):
         return f"Отзыв от {self.client_name} о {self.master}"
-    
