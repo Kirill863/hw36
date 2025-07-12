@@ -68,7 +68,7 @@ def create_review(request):
         form = ReviewForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
-            messages.success(request, 'Ваш отзыв успешно отправлен!')  # <-- Добавляем сообщение
+            messages.success(request, 'Ваш отзыв успешно отправлен!')  
             return redirect('thanks')
     else:
         form = ReviewForm()
@@ -79,7 +79,7 @@ def create_order(request):
         form = OrderForm(request.POST)
         if form.is_valid():
             form.save()
-            messages.success(request, 'Ваша заявка успешно отправлена!')  # <-- Добавляем сообщение
+            messages.success(request, 'Ваша заявка успешно отправлена!')  
             return redirect('thanks')
     else:
         form = OrderForm()

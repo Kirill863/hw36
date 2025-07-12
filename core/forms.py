@@ -9,9 +9,10 @@ RATING_CHOICES = [
     (5, '5 - Отлично'),
 ]
 
+
 class ReviewForm(forms.ModelForm):
     rating = forms.ChoiceField(choices=RATING_CHOICES, widget=forms.Select(attrs={'class': 'form-control'}))
-    
+
     class Meta:
         model = Review
         fields = ['master', 'rating', 'client_name', 'text', 'photo']
@@ -21,6 +22,7 @@ class ReviewForm(forms.ModelForm):
             'text': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
             'photo': forms.FileInput(attrs={'class': 'form-control'}),
         }
+
 
 class OrderForm(forms.ModelForm):
     class Meta:
@@ -34,7 +36,8 @@ class OrderForm(forms.ModelForm):
         if 'master' in self.data:
             try:
                 master_id = int(self.data.get('master'))
-                self.fields['services'].queryset = Service.objects.filter(master_id=master_id)
+                
+                self.fields['services'].queryset = Service.objects.filter(masters__id=master_id)
             except (ValueError, TypeError):
                 pass  # Если мастер не выбран или ошибка
         elif self.instance.pk:
