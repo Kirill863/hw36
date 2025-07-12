@@ -7,24 +7,36 @@
     <title>{% block title %}Барбершоп "Стальная борода"{% endblock %}</title>
 
     <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap @5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+
     <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons @1.11.3/font/bootstrap-icons.min.css">
+
+    <!-- Локальные статические файлы -->
     <link rel="stylesheet" href="{% static 'main.css' %}">
+    <script src="{% static 'main.js' %}" defer></script>
+
     {% block extra_head %}{% endblock %}
 </head>
 <body>
+
     <header class="header bg-light">
         {% include 'includes/menu.html' %}
     </header>
 
-    <main class="container mt-5">
+    <main class="container mt-5 position-relative">
+        <!-- Отображение сообщений Django как Toast уведомлений -->
         {% if messages %}
-        <div class="messages">
+        <div id="toast-container" class="position-fixed top-0 end-0 p-3" style="z-index: 1050;">
             {% for message in messages %}
-            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            <div class="toast align-items-center text-bg-{{ message.tags }} border-0 show" role="alert" aria-live="assertive" aria-atomic="true">
+                <div class="d-flex">
+                    <div class="toast-body">
+                        {{ message }}
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
             </div>
             {% endfor %}
         </div>
@@ -41,18 +53,27 @@
         </div>
     </footer>
 
-    <!-- Bootstrap JS с integrity проверкой -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" crossorigin="anonymous"></script>
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap @5.3.0/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
+        crossorigin="anonymous"></script>
+
     <script src="{% static 'main.js' %}"></script>
     {% block scripts %}{% endblock %}
-    
-    <!-- Отладочный элемент -->
+
+    <!-- DEBUG: Для теста -->
     <div style="position: fixed; bottom: 0; right: 0; background: red; color: white; padding: 5px; z-index: 1000; display: none;">
         DEBUG: Base template loaded
     </div>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             document.querySelector('div[style*="DEBUG"]').style.display = 'block';
+
+            // Автоматическое закрытие тостов через 5 секунд
+            document.querySelectorAll('.toast').forEach(toastEl => {
+                const toast = new bootstrap.Toast(toastEl, { delay: 5000 });
+                toast.show();
+            });
         });
     </script>
 </body>
