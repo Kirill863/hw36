@@ -10,6 +10,7 @@ from .forms import ReviewForm, OrderForm
 from django.http import JsonResponse
 from django.http import JsonResponse
 from django.template.loader import render_to_string
+from django.contrib import messages 
 
 def index(request):
     masters = Master.objects.all()
@@ -67,6 +68,7 @@ def create_review(request):
         form = ReviewForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
+            messages.success(request, 'Ваш отзыв успешно отправлен!')  # <-- Добавляем сообщение
             return redirect('thanks')
     else:
         form = ReviewForm()
@@ -77,6 +79,7 @@ def create_order(request):
         form = OrderForm(request.POST)
         if form.is_valid():
             form.save()
+            messages.success(request, 'Ваша заявка успешно отправлена!')  # <-- Добавляем сообщение
             return redirect('thanks')
     else:
         form = OrderForm()
