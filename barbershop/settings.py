@@ -189,3 +189,6 @@ MISTRAL_MODERATIONS_GRADES = {
     "law": 0.3,
     "pii": 0.3,
 }
+
+TELEGRAM_BOT_TOKEN = os.getenv('TELEGRAM_BOT_TOKEN')
+TELEGRAM_CHAT_ID = os.getenv('TELEGRAM_CHAT_ID')
