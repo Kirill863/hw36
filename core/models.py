@@ -13,6 +13,7 @@ class Service(models.Model):
     duration = models.IntegerField(null=True, blank=True, verbose_name="Длительность (мин)")
     is_popular = models.BooleanField(default=False, verbose_name="Популярная услуга")
     is_published = models.BooleanField(default=True, verbose_name="Опубликована")
+    image = models.ImageField(upload_to='services/', null=True, blank=True) 
     
 
     class Meta:
