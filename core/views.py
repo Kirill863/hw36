@@ -30,19 +30,20 @@ def order_list(request):
     search_phone = 'search_phone' in request.GET
     search_comment = 'search_comment' in request.GET
 
+    # Базовый queryset
     orders = Order.objects.select_related('master').prefetch_related('services').order_by('-date_created')
 
+    # Фильтрация по поисковому запросу
     if query:
-        q_objects = Q()
+        filters = Q()
         if search_name:
-            q_objects |= Q(client_name__icontains=query)
+            filters |= Q(client_name__icontains=query)
         if search_phone:
-            q_objects |= Q(phone__icontains=query)
+            filters |= Q(phone__icontains=query)
         if search_comment:
-            q_objects |= Q(comment__icontains=query)
-        
-        if q_objects:
-            orders = orders.filter(q_objects)
+            filters |= Q(comment__icontains=query)
+
+        orders = orders.filter(filters)
 
     return render(request, 'orders/order_list.html', {
         'orders': orders,
@@ -51,6 +52,7 @@ def order_list(request):
         'search_phone': search_phone,
         'search_comment': search_comment,
     })
+
 
 @login_required
 def order_detail(request, pk):
