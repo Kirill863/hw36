@@ -31,13 +31,13 @@ def handle_order_services_change(sender, instance, action, **kwargs):
 
         # Формируем сообщение
         message = (
-            f"*🆕 Новый заказ на услуги*\n\n"
+            f"* Новый заказ на услуги*\n\n"
             f"*Имя клиента:* {instance.client_name}\n"
             f"*Телефон:* {instance.phone}\n"
             f"*Мастер:* {barber_name}\n"
             f"*Дата записи:* {instance.date.strftime('%d.%m.%Y %H:%M')}\n\n"
             f"*Выбранные услуги:*\n{services_list}\n\n"
-            f"🔗 [Посмотреть в админке](http://127.0.0.1:8000/admin/core/order/{instance.id}/)"
+            f" [Посмотреть в админке](http://127.0.0.1:8000/admin/core/order/{instance.id}/)"
         )
 
         # Отправляем уведомление
