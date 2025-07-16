@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'core',
     'corsheaders',
     'modeltranslation',
+    'users.apps.UsersConfig',
     
 ]
 
