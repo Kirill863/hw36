@@ -33,6 +33,7 @@ urlpatterns = [
     path('orders/<int:pk>/', views.order_detail, name='order_detail'),
     path('accounts/', include('django.contrib.auth.urls')),
     path('orders/review_form/', views.ReviewCreateView.as_view(), name='review_create'),
+    path('users/', include('users.urls')),
 ]
 
 if settings.DEBUG:
