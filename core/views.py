@@ -1,104 +1,104 @@
 from django.contrib import admin
-from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth.decorators import login_required
+from django.views.generic import TemplateView, ListView, DetailView, CreateView
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
 from django.http import JsonResponse
 from django.urls import reverse_lazy
-from django.views.generic import CreateView
+from django.template.loader import render_to_string
+from django.contrib import messages
 from .models import Master, Service, Order, Review
 from .forms import ReviewForm, OrderForm
-from django.http import JsonResponse
-from django.http import JsonResponse
-from django.template.loader import render_to_string
-from django.contrib import messages 
 
-def index(request):
-    masters = Master.objects.all()
-    reviews = Review.objects.select_related('master').all()[:5]
-    services = Service.objects.all()
+# Главная страница
+class IndexView(TemplateView):
+    template_name = 'barbershop/index.html'
 
-    return render(request, 'barbershop/index.html', {
-        'masters': masters,
-        'reviews': reviews,
-        'services': services
-    })
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['masters'] = Master.objects.all()
+        context['reviews'] = Review.objects.select_related('master').all()[:5]
+        context['services'] = Service.objects.all()
+        return context
 
-@login_required
-def order_list(request):
-    query = request.GET.get('q', '')
-    search_name = 'search_name' in request.GET
-    search_phone = 'search_phone' in request.GET
-    search_comment = 'search_comment' in request.GET
+class ThanksView(TemplateView):
+    template_name = 'orders/thanks.html' 
 
-    # Базовый queryset
-    orders = Order.objects.select_related('master').prefetch_related('services').order_by('-date_created')
+# Список заказов
+class OrderListView(LoginRequiredMixin, ListView):
+    model = Order
+    template_name = 'orders/order_list.html'
+    context_object_name = 'orders'
+    ordering = ['-date_created']
 
-    # Фильтрация по поисковому запросу
-    if query:
-        filters = Q()
-        if search_name:
-            filters |= Q(client_name__icontains=query)
-        if search_phone:
-            filters |= Q(phone__icontains=query)
-        if search_comment:
-            filters |= Q(comment__icontains=query)
+    def get_queryset(self):
+        queryset = super().get_queryset().select_related('master').prefetch_related('services')
+        query = self.request.GET.get('q', '')
+        
+        if query:
+            filters = Q()
+            if 'search_name' in self.request.GET:
+                filters |= Q(client_name__icontains=query)
+            if 'search_phone' in self.request.GET:
+                filters |= Q(phone__icontains=query)
+            if 'search_comment' in self.request.GET:
+                filters |= Q(comment__icontains=query)
+            
+            queryset = queryset.filter(filters)
+        
+        return queryset
 
-        orders = orders.filter(filters)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['query'] = self.request.GET.get('q', '')
+        context['search_name'] = 'search_name' in self.request.GET
+        context['search_phone'] = 'search_phone' in self.request.GET
+        context['search_comment'] = 'search_comment' in self.request.GET
+        return context
 
-    return render(request, 'orders/order_list.html', {
-        'orders': orders,
-        'query': query,
-        'search_name': search_name,
-        'search_phone': search_phone,
-        'search_comment': search_comment,
-    })
+# Детали заказа
+class OrderDetailView(LoginRequiredMixin, DetailView):
+    model = Order
+    template_name = 'orders/order_detail.html'
+    context_object_name = 'order'
 
+    def get_queryset(self):
+        return super().get_queryset().select_related('master').prefetch_related('services')
 
-@login_required
-def order_detail(request, pk):
-    order = get_object_or_404(
-        Order.objects.select_related('master').prefetch_related('services'), 
-        pk=pk
-    )
-    return render(request, 'orders/order_detail.html', {'order': order})
+# Страница благодарности
+class ThanksView(TemplateView):
+    template_name = 'orders/thanks.html'
 
-def thanks(request):
-    return render(request, 'orders/thanks.html')
+# Создание отзыва
+class ReviewCreateView(CreateView):
+    model = Review
+    form_class = ReviewForm
+    template_name = 'orders/review_form.html'
+    success_url = reverse_lazy('thanks')
 
-def create_review(request):
-    if request.method == 'POST':
-        form = ReviewForm(request.POST, request.FILES)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Ваш отзыв успешно отправлен!')  
-            return redirect('thanks')
-    else:
-        form = ReviewForm()
-    return render(request, 'orders/review_form.html', {'form': form})
+    def form_valid(self, form):
+        messages.success(self.request, 'Ваш отзыв успешно отправлен!')
+        return super().form_valid(form)
 
-def create_order(request):
-    if request.method == 'POST':
-        form = OrderForm(request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Ваша заявка успешно отправлена!')  
-            return redirect('thanks')
-    else:
-        form = OrderForm()
-    return render(request, 'orders/order_form.html', {'form': form})
+# Создание заказа
+class OrderCreateView(CreateView):
+    model = Order
+    form_class = OrderForm
+    template_name = 'orders/order_form.html'
+    success_url = reverse_lazy('thanks')
 
+    def form_valid(self, form):
+        messages.success(self.request, 'Ваша заявка успешно отправлена!')
+        return super().form_valid(form)
+
+# Получение услуг для мастера (AJAX)
 def get_services(request):
     master_id = request.GET.get('master_id')
     
     if master_id:
         try:
-            # Получаем услуги, связанные с мастером
             services = Service.objects.filter(masters__id=master_id)
-            
-            # Получаем уже выбранные услуги (для сохранения состояния чекбоксов)
             selected_services = request.GET.getlist('selected_services[]')
-
-            # Рендерим шаблон
+            
             html = render_to_string('orders/services_checkboxes.html', {
                 'services': services,
                 'selected_services': selected_services
@@ -106,24 +106,11 @@ def get_services(request):
 
             return JsonResponse({'html': html})
         except Exception as e:
-            # Логируем ошибку и возвращаем сообщение
             print("Ошибка при загрузке услуг:", str(e))
             return JsonResponse({'error': 'Ошибка при загрузке услуг'}, status=500)
-    else:
-        return JsonResponse({'html': ''})
-    
-class ReviewCreateView(CreateView):
-    model = Review
-    form_class = ReviewForm
-    template_name = 'orders/review_form.html'
-    success_url = reverse_lazy('thanks')  # Перенаправление после успешного сохранения
+    return JsonResponse({'html': ''})
 
-class OrderCreateView(CreateView):
-    model = Order
-    form_class = OrderForm
-    template_name = 'orders/order_form.html'
-    success_url = reverse_lazy('thanks')
-
+# Фильтр по рейтингу (для админки)
 class RatingFilter(admin.SimpleListFilter):
     title = 'Рейтинг'
     parameter_name = 'rating'

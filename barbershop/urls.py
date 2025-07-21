@@ -20,7 +20,8 @@ from django.conf import settings
 from django.conf.urls.static import static
 from core import views
 from django.urls import path
-
+from django.urls import path
+from core.views import ThanksView 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -34,6 +35,7 @@ urlpatterns = [
     path('accounts/', include('django.contrib.auth.urls')),
     path('orders/review_form/', views.ReviewCreateView.as_view(), name='review_create'),
     path('users/', include('users.urls')),
+    path('thanks/', ThanksView.as_view(), name='thanks'),
 ]
 
 if settings.DEBUG:
