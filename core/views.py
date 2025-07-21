@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.shortcuts import get_object_or_404
 from django.views.generic import TemplateView, ListView, DetailView, CreateView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Q
@@ -24,11 +25,12 @@ class ThanksView(TemplateView):
     template_name = 'orders/thanks.html' 
 
 # Список заказов
-class OrderListView(LoginRequiredMixin, ListView):
+class OrdersListView(LoginRequiredMixin, ListView):
     model = Order
-    template_name = 'orders/order_list.html'
+    template_name = 'orders/order_list.html'  # Уточненный путь к шаблону
     context_object_name = 'orders'
     ordering = ['-date_created']
+    paginate_by = 10  # Опционально: добавить пагинацию
 
     def get_queryset(self):
         queryset = super().get_queryset().select_related('master').prefetch_related('services')
@@ -36,12 +38,15 @@ class OrderListView(LoginRequiredMixin, ListView):
         
         if query:
             filters = Q()
-            if 'search_name' in self.request.GET:
-                filters |= Q(client_name__icontains=query)
-            if 'search_phone' in self.request.GET:
-                filters |= Q(phone__icontains=query)
-            if 'search_comment' in self.request.GET:
-                filters |= Q(comment__icontains=query)
+            search_params = {
+                'search_name': 'client_name__icontains',
+                'search_phone': 'phone__icontains',
+                'search_comment': 'comment__icontains'
+            }
+            
+            for param, field_lookup in search_params.items():
+                if param in self.request.GET:
+                    filters |= Q(**{field_lookup: query})
             
             queryset = queryset.filter(filters)
         
@@ -50,20 +55,36 @@ class OrderListView(LoginRequiredMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['query'] = self.request.GET.get('q', '')
-        context['search_name'] = 'search_name' in self.request.GET
-        context['search_phone'] = 'search_phone' in self.request.GET
-        context['search_comment'] = 'search_comment' in self.request.GET
+        # Добавляем флаги поиска в контекст
+        for param in ['search_name', 'search_phone', 'search_comment']:
+            context[param] = param in self.request.GET
         return context
 
 # Детали заказа
 class OrderDetailView(LoginRequiredMixin, DetailView):
     model = Order
-    template_name = 'orders/order_detail.html'
+    template_name = 'orders/order_detail.html'  # Уточненный путь к шаблону
     context_object_name = 'order'
+    pk_url_kwarg = 'pk'  # Параметр URL по умолчанию, можно не указывать явно
 
     def get_queryset(self):
+        """
+        Оптимизация запросов к БД с помощью select_related и prefetch_related
+        """
         return super().get_queryset().select_related('master').prefetch_related('services')
 
+    def get_object(self, queryset=None):
+        """
+        Получение объекта с обработкой случая, когда заявка не найдена
+        """
+        if queryset is None:
+            queryset = self.get_queryset()
+        
+        pk = self.kwargs.get(self.pk_url_kwarg)
+        queryset = queryset.filter(pk=pk)
+        
+        obj = get_object_or_404(queryset)
+        return obj
 # Страница благодарности
 class ThanksView(TemplateView):
     template_name = 'orders/thanks.html'
@@ -73,11 +94,16 @@ class ReviewCreateView(CreateView):
     model = Review
     form_class = ReviewForm
     template_name = 'orders/review_form.html'
-    success_url = reverse_lazy('thanks')
+    success_url = reverse_lazy('thanks')  # Редирект после успешного создания
 
     def form_valid(self, form):
-        messages.success(self.request, 'Ваш отзыв успешно отправлен!')
-        return super().form_valid(form)
+        """Добавляем success-сообщение при успешном создании отзыва"""
+        response = super().form_valid(form)
+        messages.success(
+            self.request,
+            'Ваш отзыв успешно отправлен!'
+        )
+        return response
 
 # Создание заказа
 class OrderCreateView(CreateView):
@@ -87,9 +113,20 @@ class OrderCreateView(CreateView):
     success_url = reverse_lazy('thanks')
 
     def form_valid(self, form):
-        messages.success(self.request, 'Ваша заявка успешно отправлена!')
-        return super().form_valid(form)
+        """Обработка валидной формы и добавление сообщения"""
+        response = super().form_valid(form)
+        messages.success(
+            self.request,
+            'Ваша заявка успешно отправлена!'
+        )
+        return response
 
+    def get_context_data(self, **kwargs):
+        """Добавление дополнительного контекста для AJAX-загрузки услуг"""
+        context = super().get_context_data(**kwargs)
+        context['services'] = Service.objects.none()  # Пустой queryset по умолчанию
+        return context
+    
 # Получение услуг для мастера (AJAX)
 def get_services(request):
     master_id = request.GET.get('master_id')
