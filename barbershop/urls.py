@@ -16,7 +16,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     
     # Главная страница
-    path('', IndexView.as_view(), name='index'),  # Исправлено здесь
+    path('', IndexView.as_view(), name='index'),  
     
     # Заказы
     path('order/create/', OrderCreateView.as_view(), name='create_order'),

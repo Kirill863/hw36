@@ -27,10 +27,10 @@ class ThanksView(TemplateView):
 # Список заказов
 class OrdersListView(LoginRequiredMixin, ListView):
     model = Order
-    template_name = 'orders/order_list.html'  # Уточненный путь к шаблону
+    template_name = 'orders/order_list.html'  
     context_object_name = 'orders'
     ordering = ['-date_created']
-    paginate_by = 10  # Опционально: добавить пагинацию
+    paginate_by = 10  
 
     def get_queryset(self):
         queryset = super().get_queryset().select_related('master').prefetch_related('services')
@@ -63,9 +63,9 @@ class OrdersListView(LoginRequiredMixin, ListView):
 # Детали заказа
 class OrderDetailView(LoginRequiredMixin, DetailView):
     model = Order
-    template_name = 'orders/order_detail.html'  # Уточненный путь к шаблону
+    template_name = 'orders/order_detail.html'  
     context_object_name = 'order'
-    pk_url_kwarg = 'pk'  # Параметр URL по умолчанию, можно не указывать явно
+    pk_url_kwarg = 'pk'  
 
     def get_queryset(self):
         """
@@ -94,7 +94,7 @@ class ReviewCreateView(CreateView):
     model = Review
     form_class = ReviewForm
     template_name = 'orders/review_form.html'
-    success_url = reverse_lazy('thanks')  # Редирект после успешного создания
+    success_url = reverse_lazy('thanks')  
 
     def form_valid(self, form):
         """Добавляем success-сообщение при успешном создании отзыва"""
@@ -124,7 +124,7 @@ class OrderCreateView(CreateView):
     def get_context_data(self, **kwargs):
         """Добавление дополнительного контекста для AJAX-загрузки услуг"""
         context = super().get_context_data(**kwargs)
-        context['services'] = Service.objects.none()  # Пустой queryset по умолчанию
+        context['services'] = Service.objects.none() 
         return context
     
 # Получение услуг для мастера (AJAX)
