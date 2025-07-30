@@ -1,10 +1,10 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm  # Добавлен импорт AuthenticationForm
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
-class RegisterForm(UserCreationForm):
+class UserRegisterForm(UserCreationForm):
     email = forms.EmailField(
         label=_("Email"),
         widget=forms.EmailInput(attrs={
@@ -89,7 +89,6 @@ class RegisterForm(UserCreationForm):
                 code='password_entirely_numeric'
             )
         
-        # Дополнительные проверки сложности пароля
         if password1.lower() == password1:
             raise ValidationError(
                 _("Пароль должен содержать хотя бы одну заглавную букву"),
@@ -106,3 +105,29 @@ class RegisterForm(UserCreationForm):
                 code='email_exists'
             )
         return email
+
+class UserLoginForm(AuthenticationForm):
+    username = forms.CharField(
+        label=_("Имя пользователя"),
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': _('Введите имя пользователя'),
+            'autofocus': True
+        })
+    )
+    
+    password = forms.CharField(
+        label=_("Пароль"),
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-control',
+            'placeholder': _('Введите пароль')
+        })
+    )
+    
+    error_messages = {
+        'invalid_login': _(
+            "Пожалуйста, введите правильные имя пользователя и пароль. "
+            "Оба поля могут быть чувствительны к регистру."
+        ),
+        'inactive': _("Этот аккаунт неактивен."),
+    }
