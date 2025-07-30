@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}Мой профиль{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h2 class="card-title mb-4">Мой профиль</h2>
+                    
+                    <div class="row">
+                        <div class="col-md-4 text-center">
+                            <img src="{{ user.profile.avatar.url }}" 
+                                class="img-thumbnail mb-3" 
+                                alt="Аватар" 
+                                style="max-width: 200px;">
+                        </div>
+                        <div class="col-md-8">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item">
+                                    <strong>Имя пользователя:</strong> {{ user.username }}
+                                </li>
+                                <li class="list-group-item">
+                                    <strong>Email:</strong> {{ user.email }}
+                                </li>
+                                <li class="list-group-item">
+                                    <strong>Имя:</strong> {{ user.first_name }}
+                                </li>
+                                <li class="list-group-item">
+                                    <strong>Фамилия:</strong> {{ user.last_name }}
+                                </li>
+                                <li class="list-group-item">
+                                    <strong>Дата рождения:</strong> {{ user.profile.birth_date|date:"d.m.Y" }}
+                                </li>
+                                <li class="list-group-item">
+                                    <strong>Telegram:</strong> {{ user.profile.telegram_id }}
+                                </li>
+                            </ul>
+                            
+                            <div class="mt-4">
+                                <a href="{% url 'users:profile_edit' %}" class="btn btn-primary">
+                                    Редактировать профиль
+                                </a>
+                                <a href="{% url 'users:password_change' %}" class="btn btn-outline-secondary">
+                                    Сменить пароль
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
