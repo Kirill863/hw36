@@ -7,16 +7,24 @@ from django.contrib.auth import login, logout, authenticate
 from .forms import UserRegisterForm, UserLoginForm
 
 
-def register_view(request):
-    if request.method == 'POST':
-        form = UserRegisterForm(request.POST)
-        if form.is_valid():
-            user = form.save()
-            login(request, user)
-            return redirect('/')
-    else:
-        form = UserRegisterForm()
-    return render(request, 'users/register.html', {'form': form})
+from django.views.generic import CreateView
+from django.urls import reverse_lazy
+from .forms import UserRegisterForm
+from django.contrib import messages
+
+class RegisterView(CreateView):
+    form_class = UserRegisterForm
+    template_name = 'users/register.html'
+    success_url = reverse_lazy('users:login')  # Используем пространство имен
+    
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        messages.success(self.request, 'Регистрация прошла успешно! Теперь вы можете войти.')
+        return response
+    
+    def form_invalid(self, form):
+        messages.error(self.request, 'Пожалуйста, исправьте ошибки в форме.')
+        return super().form_invalid(form)
 
 
 def login_view(request):
