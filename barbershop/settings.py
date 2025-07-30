@@ -118,7 +118,8 @@ USE_TZ = True
 
 MODELTRANSLATION_DEFAULT_LANGUAGE = 'ru'
 MODELTRANSLATION_TRANSLATION_FILES = (
-    'users.translation',
+    
+    'core.translation',  
 )
 
 # Static files (CSS, JavaScript, Images)

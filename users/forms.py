@@ -1,129 +1,34 @@
 from django import forms
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm  # Добавлен импорт AuthenticationForm
-from django.contrib.auth.models import User
-from django.core.exceptions import ValidationError
+from django.contrib.auth.forms import (
+    AuthenticationForm,
+    UserCreationForm,
+    PasswordChangeForm,
+    PasswordResetForm,
+    SetPasswordForm
+)
+from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
 
-class UserRegisterForm(UserCreationForm):
-    email = forms.EmailField(
-        label=_("Email"),
-        widget=forms.EmailInput(attrs={
-            'class': 'form-control',
-            'placeholder': _('example@example.com'),
-            'autocomplete': 'email'
-        }),
-        error_messages={
-            'required': _('Обязательное поле'),
-            'invalid': _('Введите корректный email адрес')
-        }
-    )
-    
-    first_name = forms.CharField(
-        label=_("Имя"),
-        max_length=30,
-        required=True,
-        widget=forms.TextInput(attrs={
-            'class': 'form-control',
-            'placeholder': _('Ваше имя')
-        })
-    )
-    
-    last_name = forms.CharField(
-        label=_("Фамилия"),
-        max_length=30,
-        required=True,
-        widget=forms.TextInput(attrs={
-            'class': 'form-control',
-            'placeholder': _('Ваша фамилия')
-        })
-    )
-    
-    password1 = forms.CharField(
-        label=_("Пароль"),
-        widget=forms.PasswordInput(attrs={
-            'class': 'form-control',
-            'placeholder': _('Создайте пароль'),
-            'autocomplete': 'new-password'
-        }),
-        help_text=_(
-            "Пароль должен содержать минимум 8 символов, "
-            "не состоять только из цифр и не быть слишком простым."
-        )
-    )
-    
-    password2 = forms.CharField(
-        label=_("Подтверждение пароля"),
-        widget=forms.PasswordInput(attrs={
-            'class': 'form-control',
-            'placeholder': _('Повторите пароль'),
-            'autocomplete': 'new-password'
-        })
-    )
-    
-    class Meta:
-        model = User
-        fields = ('username', 'email', 'first_name', 'last_name', 'password1', 'password2')
-    
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['username'].widget.attrs.update({
-            'class': 'form-control',
-            'placeholder': _('Придумайте логин'),
-            'autocomplete': 'username'
-        })
-        self.fields['username'].help_text = _(
-            'Не более 150 символов. Только буквы, цифры и @/./+/-/_'
-        )
-    
-    def clean_password1(self):
-        password1 = self.cleaned_data.get('password1')
-        if len(password1) < 8:
-            raise ValidationError(
-                _("Пароль должен содержать минимум 8 символов"),
-                code='password_too_short'
-            )
-        
-        if password1.isdigit():
-            raise ValidationError(
-                _("Пароль не может состоять только из цифр"),
-                code='password_entirely_numeric'
-            )
-        
-        if password1.lower() == password1:
-            raise ValidationError(
-                _("Пароль должен содержать хотя бы одну заглавную букву"),
-                code='password_no_upper'
-            )
-        
-        return password1
-    
-    def clean_email(self):
-        email = self.cleaned_data.get('email')
-        if User.objects.filter(email=email).exists():
-            raise ValidationError(
-                _("Пользователь с таким email уже зарегистрирован"),
-                code='email_exists'
-            )
-        return email
+User = get_user_model()
 
 class UserLoginForm(AuthenticationForm):
+    """Форма входа пользователя с Bootstrap стилями"""
     username = forms.CharField(
-        label=_("Имя пользователя"),
+        label=_('Имя пользователя'),
         widget=forms.TextInput(attrs={
             'class': 'form-control',
             'placeholder': _('Введите имя пользователя'),
             'autofocus': True
         })
     )
-    
     password = forms.CharField(
-        label=_("Пароль"),
+        label=_('Пароль'),
         widget=forms.PasswordInput(attrs={
             'class': 'form-control',
             'placeholder': _('Введите пароль')
         })
     )
-    
+
     error_messages = {
         'invalid_login': _(
             "Пожалуйста, введите правильные имя пользователя и пароль. "
@@ -131,3 +36,127 @@ class UserLoginForm(AuthenticationForm):
         ),
         'inactive': _("Этот аккаунт неактивен."),
     }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['username'].label = _('Имя пользователя или Email')
+
+
+class UserRegisterForm(UserCreationForm):
+    """Форма регистрации пользователя с дополнительными полями"""
+    email = forms.EmailField(
+        required=True,
+        widget=forms.EmailInput(attrs={
+            'class': 'form-control',
+            'placeholder': _('Введите ваш email')
+        }),
+        label=_('Email'),
+        help_text=_('На этот email будет отправлено письмо для подтверждения')
+    )
+
+    class Meta:
+        model = User
+        fields = ('username', 'email', 'password1', 'password2')
+        labels = {
+            'username': _('Имя пользователя'),
+            'password1': _('Пароль'),
+            'password2': _('Подтверждение пароля'),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Настройка виджетов и удаление help_text
+        for field_name in self.fields:
+            self.fields[field_name].widget.attrs.update({'class': 'form-control'})
+            self.fields[field_name].help_text = None
+            self.fields[field_name].widget.attrs['placeholder'] = self.fields[field_name].label
+
+        # Кастомные placeholder для паролей
+        self.fields['password1'].widget.attrs['placeholder'] = _('Введите пароль')
+        self.fields['password2'].widget.attrs['placeholder'] = _('Повторите пароль')
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if User.objects.filter(email=email).exists():
+            raise forms.ValidationError(_('Пользователь с таким email уже существует'))
+        return email
+
+
+class UserProfileUpdateForm(forms.ModelForm):
+    """Форма обновления профиля пользователя"""
+    birth_date = forms.DateField(
+        widget=forms.DateInput(
+            attrs={'type': 'date', 'class': 'form-control'},
+            format='%Y-%m-%d'
+        ),
+        required=False,
+        label=_('Дата рождения')
+    )
+
+    class Meta:
+        model = User
+        fields = ['username', 'email', 'avatar', 'birth_date', 'telegram_id', 'github_id']
+        widgets = {
+            'username': forms.TextInput(attrs={'class': 'form-control'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control'}),
+            'telegram_id': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': '@username'
+            }),
+            'github_id': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'username'
+            }),
+            'avatar': forms.FileInput(attrs={'class': 'form-control'}),
+        }
+        labels = {
+            'telegram_id': _('Telegram username'),
+            'github_id': _('GitHub username'),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['email'].required = True
+
+
+class UserPasswordChangeForm(PasswordChangeForm):
+    """Форма смены пароля"""
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields:
+            self.fields[field].widget.attrs.update({
+                'class': 'form-control',
+                'placeholder': self.fields[field].label
+            })
+            self.fields[field].help_text = None
+
+
+class CustomPasswordResetForm(PasswordResetForm):
+    """Кастомная форма сброса пароля"""
+    email = forms.EmailField(
+        label=_('Email'),
+        max_length=254,
+        widget=forms.EmailInput(attrs={
+            'class': 'form-control',
+            'placeholder': _('Введите email, указанный при регистрации'),
+            'autocomplete': 'email'
+        })
+    )
+
+    def clean_email(self):
+        email = self.cleaned_data['email']
+        if not User.objects.filter(email__iexact=email, is_active=True).exists():
+            raise forms.ValidationError(_('Пользователь с таким email не найден'))
+        return email
+
+
+class CustomSetPasswordForm(SetPasswordForm):
+    """Форма установки нового пароля"""
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields:
+            self.fields[field].widget.attrs.update({
+                'class': 'form-control',
+                'placeholder': self.fields[field].label
+            })
+            self.fields[field].help_text = None
